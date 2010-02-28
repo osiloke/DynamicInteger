@@ -5,13 +5,12 @@ Created on Feb 25, 2010
 '''
 from DynamInt import *
 def main():
-    test = DynamInt()
-    b = DynamInt()
-    test.set(str(2**1024))
-    b.set(str(2**1024))
-    '''test.printme()'''
+    test = DynamInt('8')
+    b = DynamInt('5')
     print "Adding test to b "+(test+b)
+    print (test-b)
     print b>test
     print b<test
+    print b == test
 if __name__ == '__main__':
     main() 

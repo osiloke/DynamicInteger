@@ -20,14 +20,23 @@ class DynamInt:
     '''
 
 
-    def __init__(self):
+    def __init__(self, num = None):
         '''
         Constructor
         '''
-        self.data = ''
-    def set(self, str): 
+        self.neg = False
+        if num is None:
+            self.data = ''
+            self.size  = 0
+        else:
+            self.size = len(num)
+            self.data = num
+            if '-' in num: self.neg = True
+            self.data.replace('-', '') 
+            self.data.replace(' ', '')
+    '''def assign(self, str): 
         self.data = str
-    
+        self.size = len(str)'''
     ''' Arithmetic Operators '''
     def __add__(self, num):
         '''
@@ -37,7 +46,7 @@ class DynamInt:
             @return added DynamInt
         ''' 
         if not isinstance(num, DynamInt):
-            raise TypeError, "num must be a DynamInt instance"
+            raise TypeError, "must be a DynamInt instance"
         '''
         Basically, this selects what should be added to what
         it is based on primary school addition techniques
@@ -51,7 +60,7 @@ class DynamInt:
                 -------------
         The larger number goes on top while the smaller goes below
         '''
-        if (len(self.data) > len(num.data)):
+        if (self  > num ):
             top = self.data
             bottom = num.data
         else:
@@ -59,6 +68,11 @@ class DynamInt:
             bottom = self.data
         '''
         Temporary Variables used in addition process
+        tempSum     ----- Stores partial subtraction
+        j           ----- Stores length of bottom number
+        i           ----- Stores length of top number
+        sum         ----- Stores final sum string
+        carryover   ----- A flag that determines if there is a carryover to the next digit
         '''
         tempSum = 0
         j = len(bottom)-1
@@ -82,13 +96,13 @@ class DynamInt:
             else:
                 carryover = 0
             ''' lets concatenate the main sum outputed '''
-            sum = str(tempSum)+sum  
+            sum = str(tempSum)+sum
             i-=1
-        
+        if carryover == 1: sum = str(carryover)+sum
         return sum
     def __sub__(self, num):
         '''
-            Overloaded minus function
+            Overloaded Subtraction function
             subtracts an existing DynamInt from this one
             
             @param  num reference to an existing DynamInt
@@ -100,6 +114,44 @@ class DynamInt:
         '''
         Uses two's compliment on each element of both numbers
         '''
+        if self == num: return '0'
+        if (self  > num):
+            top = self.data
+            bottom = num.data
+        else:
+            top = num.data
+            bottom = self.data
+        '''
+        Temporary Variables used in addition process
+        tempSub     ----- Stores partial subtraction
+        j           ----- Stores length of bottom number
+        i           ----- Stores length of top number
+        sub         ----- Stores final sub string
+        borrow      ----- A flag that determines if it would need to borrow from next digit
+        '''
+        tempSub = 0
+        j = len(bottom)-1
+        i = len(top)-1
+        borrow = 0
+        sub = ''
+        while i >= 0:
+            
+            ''' Have we run out of bottom digits ? '''
+            if (j >= 0):  
+                tempSub = int(top[i])-int(bottom[j]) 
+                if tempSub < 1: borrow = 1
+                tempSub = tempSub+10  
+                j-=1
+            else:
+                ''' No more bottom digits, subtract any leftover borrow out'''
+                tempSub = int(top[i])-borrow
+            
+            ''' lets concatenate the main sum outputed '''
+            sub = str(tempSub)+sub
+            i-=1
+        if borrow == 1: sum = '-'+sub
+        return sub
+        
     def __mul__(self, num):
         '''
             Overloaded add function
@@ -121,7 +173,7 @@ class DynamInt:
         if not isinstance(num, DynamInt):
             raise TypeError, "num must be a DynamInt instance"
         return '0'
-    def mod(self, num):
+    def __mod__(self, num):
         '''
             Overloaded add function
             Adds an existing DynamInt to this one
@@ -165,17 +217,18 @@ class DynamInt:
                  -------------
         In this case it uses False, since 10345 is less than 92340
         '''
-        if (len(self.data) > len(num.data)):
+        if (self == num): return False
+        if (self.size > num.size):
             return True
-        elif (len(self.data) < len(num.data)):
+        elif (self.size < num.size):
             return False
         
         '''
         Temporary Variables used in addition process
         '''
         greater = False
-        j = len(self.data)-1
-        i = len(num.data)-1
+        j = self.size-1
+        i = num.size-1
         lhs  = self.data
         rhs = num.data
         while i >= 0:
@@ -221,7 +274,7 @@ class DynamInt:
                  -------------
         In this case it uses False, since 10345 is less than 92340
         '''
-        if (len(self.data) == len(num.data)): return False
+        if (self == num): return False
         return not(self.__gt__(num))
     def __eq__(self,num):
         '''
@@ -233,10 +286,33 @@ class DynamInt:
         ''' 
         if not isinstance(num, DynamInt):
             raise TypeError, "num must be a DynamInt instance"
-        return '0'
+        if (self.size > num.size):
+            return False
+        elif (self.size < num.size):
+            return False
+        
+
+        j = self.size-1
+        i = num.size-1
+        lhs  = self.data
+        rhs = num.data
+        while i >= 0:
+            
+            ''' Have we run out of bottom digits ? '''
+            if (j >= 0):  
+                compare = lhs[i] != rhs[i] 
+                if compare: return False      
+                j-=1
+            else:
+                ''' No more bottom digits, add any leftover carryover'''
+                return False       
+           
+            i-=1
+        
+        return True
     
     def printme(self):
-        print data
+        print self.data
     def modmod(self,num,m):
         if  num > m:
             return num % m
@@ -244,4 +320,3 @@ class DynamInt:
             return 1
         else:
             return 0
-            
