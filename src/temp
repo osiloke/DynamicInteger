@@ -1,0 +1,39 @@
+ def __mul__(self, num):
+        '''
+            Overloaded add function
+            Adds an existing DynamInt to this one
+            @param  num reference to an existing DynamInt
+            @return added DynamInt
+        ''' 
+        if not isinstance(num, DynamInt):
+            raise TypeError, "num must be a DynamInt instance"
+        return '1'
+        if (self > num):
+            top = self.data
+            bottom = num.data
+        
+        else:
+            top = num.data
+            bottom = self.data
+            
+        tempProduct = 0
+        product = ""
+        for i in range(0,len(bottom) -1):
+        
+            carry = 0
+            k=0
+            
+            for j in range(0, len(top) - 1):       
+                tempProduct = int(top[j]) * int(bottom[i]) + int(product[k]) + carry
+                
+                product = str(tempProduct % 10)+product
+                carry = math.floor(tempProduct/10);
+                k = i + j   
+                j-=1
+                k-=1
+    
+            if (carry != 0):            
+                product= product+str(carry)        
+            i-=1
+        
+        return product;
