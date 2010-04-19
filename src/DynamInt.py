@@ -12,15 +12,18 @@ It is essentially useful in cryptographic applications
 
 Created on Feb 25, 2010
 
-@author: Osiloke Harold Emoekpere
+@author: Harold Osiloke Emoekpere, Kermen Deol
+
 '''
+import math
+import random
 class DynamInt:
     '''
     classdocs
     '''
 
 
-    def __init__(self, num = None):
+    def __init__(self, num = 0):
         '''
         Constructor
         '''
@@ -29,11 +32,8 @@ class DynamInt:
             self.data = ''
             self.size  = 0
         else:
-            self.size = len(num)
-            self.data = num
-            if '-' in num: self.neg = True
-            self.data.replace('-', '') 
-            self.data.replace(' ', '')
+            self.data = ''
+            self.random(num)
     '''def assign(self, str): 
         self.data = str
         self.size = len(str)'''
@@ -45,8 +45,7 @@ class DynamInt:
             @param  num reference to an existing DynamInt
             @return added DynamInt
         ''' 
-        if not isinstance(num, DynamInt):
-            raise TypeError, "must be a DynamInt instance"
+         
         '''
         Basically, this selects what should be added to what
         it is based on primary school addition techniques
@@ -99,7 +98,9 @@ class DynamInt:
             sum = str(tempSum)+sum
             i-=1
         if carryover == 1: sum = str(carryover)+sum
-        return sum
+        ret_val = DynamInt()
+        ret_val.setData(sum)
+        return ret_val
     def __sub__(self, num):
         '''
             Overloaded Subtraction function
@@ -108,17 +109,17 @@ class DynamInt:
             @param  num reference to an existing DynamInt
             @return added DynamInt
         ''' 
-        if not isinstance(num, DynamInt):
-            raise TypeError, "num must be a DynamInt instance"
         
         '''
         Uses two's compliment on each element of both numbers
         '''
-        if self == num: return '0'
+        temp = DynamInt()
+        temp.setData("0")
+        if self == num: return temp
         if (self  > num):
             top = self.data
             bottom = num.data
-        else:
+        elif (num > self):
             top = num.data
             bottom = self.data
         '''
@@ -138,41 +139,29 @@ class DynamInt:
             
             ''' Have we run out of bottom digits ? '''
             if (j >= 0):  
-                tempSub = int(top[i])-int(bottom[j]) 
-                if tempSub < 1: borrow = 1
-                tempSub = tempSub+10  
+                tempSub = (int(top[i])-int(bottom[j]))-borrow 
+                if tempSub < 0: 
+                    borrow = 1
+                    tempSub = tempSub+10  
+                else: borrow=0
+                
                 j-=1
             else:
                 ''' No more bottom digits, subtract any leftover borrow out'''
                 tempSub = int(top[i])-borrow
+                if tempSub < 0: 
+                    borrow = 1
+                    tempSub = tempSub+10  
+                else: borrow=0
             
             ''' lets concatenate the main sum outputed '''
             sub = str(tempSub)+sub
             i-=1
         if borrow == 1: sum = '-'+sub
-        return sub
+        ret_val = DynamInt()
+        ret_val.setData(sub)
+        return ret_val
         
-    def __mul__(self, num):
-        '''
-            Overloaded add function
-            Adds an existing DynamInt to this one
-            @param  num reference to an existing DynamInt
-            @return added DynamInt
-        ''' 
-        if not isinstance(num, DynamInt):
-            raise TypeError, "num must be a DynamInt instance"
-        return '1'
-    def __div__(self,num):
-        '''
-            Overloaded == function
-            Checks if this DynamInt is equal to this one
-            
-            @param  num reference to an existing DynamInt
-            @return added DynamInt
-        ''' 
-        if not isinstance(num, DynamInt):
-            raise TypeError, "num must be a DynamInt instance"
-        return '0'
     def __mod__(self, num):
         '''
             Overloaded add function
@@ -180,8 +169,8 @@ class DynamInt:
             @param  num reference to an existing DynamInt
             @return added DynamInt
         ''' 
-        if not isinstance(num, DynamInt):
-            raise TypeError, "num must be a DynamInt instance"
+        
+           
         return '0'
     
     ''' 
@@ -195,8 +184,7 @@ class DynamInt:
             @param  num reference to an existing DynamInt
             @return added DynamInt
         ''' 
-        if not isinstance(num, DynamInt):
-            raise TypeError, "num must be a DynamInt instance"
+         
         '''
         Performs greater than function by applying > function on each pair of integers 
         i.e
@@ -254,8 +242,7 @@ class DynamInt:
             @return added DynamInt
         ''' 
         
-        if not isinstance(num, DynamInt):
-            raise TypeError, "num must be a DynamInt instance"
+         
         '''
         The exact opposite of greater than above
         
@@ -284,8 +271,7 @@ class DynamInt:
             @param  num reference to an existing DynamInt
             @return added DynamInt
         ''' 
-        if not isinstance(num, DynamInt):
-            raise TypeError, "num must be a DynamInt instance"
+         
         if (self.size > num.size):
             return False
         elif (self.size < num.size):
@@ -310,13 +296,18 @@ class DynamInt:
             i-=1
         
         return True
-    
     def printme(self):
         print self.data
-    def modmod(self,num,m):
-        if  num > m:
-            return num % m
-        elif num == m:
-            return 1
-        else:
-            return 0
+    def random(self,length):
+        n=0
+        while n < length:
+            self.data = str(str(random.randint(0,9))+self.data)
+            n+=1
+        self.size = len(self.data)
+    def setData(self,stri):
+        self.data=stri
+        self.size = len (stri)
+    def getData(self):
+        return self.dataff 
+        
+            
