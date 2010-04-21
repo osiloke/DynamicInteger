@@ -17,6 +17,7 @@ Created on Feb 25, 2010
 '''
 import math
 import random
+import string
 class DynamInt:
     '''
     classdocs
@@ -28,6 +29,7 @@ class DynamInt:
         Constructor
         '''
         self.neg = False
+        self.data = string
         if num is None:
             self.data = ''
             self.size  = 0
@@ -119,9 +121,10 @@ class DynamInt:
         if (self  > num):
             top = self.data
             bottom = num.data
-        elif (num > self):
+        else :
             top = num.data
             bottom = self.data
+            
         '''
         Temporary Variables used in addition process
         tempSub     ----- Stores partial subtraction
@@ -161,18 +164,61 @@ class DynamInt:
         ret_val = DynamInt()
         ret_val.setData(sub)
         return ret_val
-        
-    def __mod__(self, num):
+    def __mul__(self, num):
         '''
-            Overloaded add function
-            Adds an existing DynamInt to this one
-            @param  num reference to an existing DynamInt
-            @return added DynamInt
-        ''' 
+        The larger number goes on top while the smaller goes below
+        '''
+        if (self  > num ):
+            top = self.data
+            bottom = num.data
+        else:
+            top = num.data
+            bottom = self.data
+            
+        temp = 0
+        rem = 0
+        carry = 0
+        partial = ''
+        sum = DynamInt()
+        '''ith quotient'''
+        q_i = DynamInt()         
+        sum.setData( "0" )
+        i = len(bottom)-1
         
-           
-        return '0'
-    
+        zero = 0
+        while i >= 0 :
+            j = len(top)-1
+            partial=''
+            carry = 0
+        
+            while j >= 0:
+                '''
+                produces partial product
+                '''
+                temp = (int(bottom[i]) *  int(top[j]))+carry
+                carry = temp/10
+                partial = str(temp%10)+partial
+                j-=1
+            if carry != 0:
+                partial = str(carry)+partial
+                
+            partial = self.zeroend(zero,partial)
+            q_i.setData(partial)
+            sum = sum+q_i        
+            i-=1
+            zero+=1
+        return sum
+    def prepend(self,text):
+        self.data = text +self.data
+    def zeroend(self,no,data):
+        '''
+        append zeros to the end of a string 
+        '''
+        temp=data
+        for i in range(no):
+            temp = temp+"0"   
+            
+        return temp 
     ''' 
         Logical Operations
     '''
@@ -308,6 +354,73 @@ class DynamInt:
         self.data=stri
         self.size = len (stri)
     def getData(self):
-        return self.dataff 
+        return self.data
+    def setindex(self,index,data,rep):
+        return data[:index] +rep+ data[index+1:]
+    def __div__(self, num):
+        temp = DynamInt()
+        try:
+            temp.setData(str(int(self.data)/int(num.data)))
+        except:
+            zero = DynamInt()
+            zero.setData("0")
+        return temp
+    def __mod__(self, num):
+        '''
+            Overloaded add function
+            Adds an existing DynamInt to this one
+            @param  num reference to an existing DynamInt
+            @return added DynamInt
+        ''' 
         
+        temp = DynamInt()
+        try:
+            temp.setData(str(int(self.data)%int(num.data)))
+        except:
+            zero = DynamInt()
+            zero.setData("0")
+            return zero
+        return temp
+    def __divf__(self, num):
+        j=0
+        i = 0
+        result = ""
+        xString = ""
+        remainderString = ""
+        for n in range(len(self.data)):
+            result = result+"0"
+            xString = xString+"0"
+        for m in range(num.size):
+            remainderString = remainderString+"0"
+            
+        cur = DynamInt()
+        cur.setData(self.data[0])
+        
+        while j < len(self.data):
+            x = DynamInt()
+            x.setData(xString)
+            for i in range (num.size):
+                temp = DynamInt()
+                temp.setData(x.getData())
+                
+                x = x+num
+                
+                if x > cur:
+                    #result[j] = str(i)
+                    result = self.setindex(j, result, str(i))
+                    break
+                                
+            j+=1
+            remainder = DynamInt()
+            remainder.setData(remainderString)
+            remainder = cur - temp
+            if j ==len(self.data):
+                cur.setData(remainder.data)
+            cur.setData(remainder.data + self.data[j-1])
+        ret_val = DynamInt()
+        ret_val.setData(result)
+        return ret_val
+                
+ 
+            
             
