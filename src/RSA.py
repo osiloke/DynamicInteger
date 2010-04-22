@@ -25,6 +25,7 @@ class RSA(object):
         self.d = DynamInt()
         self.e = DynamInt()
         self.phi=DynamInt()
+        self.n=DynamInt()
         'Convenience numbers'
         self.zero=DynamInt()
         self.zero.setData("0")
@@ -35,49 +36,51 @@ class RSA(object):
         self.three = DynamInt()
         self.three.setData("3")
         self.base = DynamInt()
-        self.base.setData("10")
+        self.base.setData("20")
     '''
     Calculating RSA Parameters4
     '''    
     def createkeys(self,p,q):
-        '''
-        while self.millerRabin(p) == False or self.millerRabin(q) == False:
+        
+        while self.millerRabin(p) == False:
             'p or q is not prime, so choose another p or q'
-            print "P or Q is not prime!"
-            p+=self.one
-            q+=self.one
-        '''
+            print "P is not prime  :  "+p.data
+            p+=self.three
+        while self.millerRabin(q) == False:
+            print "Q is not prime  :  "+q.data
+            q+=self.three
+        
         #p = self.randomprime()
         #q = self.randomprime()   
-        p.setData("821089628001493")
-        q.setData("1872967539195764008553239")    
-        print "Found Primes"
-        print "p = "
-        p.printme()
-        print "q = "
-        q.printme()
+         
+        
         'numbers are prime so lets save the data and continue generating keys'
         self.p = p
         self.q = q
         self.n = p*q        
         self.createphi()
-        print " n "+self.n.data
-        'generate a random encrypt key of length len'
-        print "creating e"
-        e = DynamInt(self.len)
-        e.setData("197")
-        temp = self.gcd(e,self.phi)
-        while not  (temp == self.one):
+        print " Prime P        :   "+ p.data
+        print " Prime Q        :   "+ q.data
+        print " Modulus n      :   "+self.n.data
+        e = DynamInt(1)
+        '''
+        Lets get a prime 1 < e < phi
+        '''
+        while not  (self.gcd(e,self.phi) == self.one):
             #e.random(len)
             e = e+self.one
+            if e > self.phi: e = self.one
             #e.printme()
-            temp =self.gcd(e,self.phi)
+            #temp =self.gcd(e,self.phi)
         self.e = e
+        '''
+        constraint, 1 < d < phi
+                    d = 1/e mod phi
+        '''
         self.d = self.multiplicativeInverse(self.e, self.phi)
-        print " e "
-        e.printme()
-        print " d "
-        self.d.printme()
+           
+        print " encryption key :  "+ self.e.data
+        print " decryption key :  "+ self.d.data
         return True
     def randomprime(self):
         '''
@@ -141,7 +144,7 @@ class RSA(object):
                 
                 a, b = b%a, a
                 tt = b/a
-                print tr.data +" = " + tt.data + "*"+t.data+"+"+a.data
+                #print tr.data +" = " + tt.data + "*"+t.data+"+"+a.data
         return b
 
     def isPrime(self, num):
@@ -173,7 +176,7 @@ class RSA(object):
             
             while (p%self.two == self.zero):
             
-                s=s+self.zero
+                s+=self.zero
                 p=p/self.two
             
             r = p
@@ -277,7 +280,7 @@ class RSA(object):
             'convert to ascii base 10'
             ascii = DynamInt()
             ascii.setData(str(ord(i)))
-            guise = ascii+guise*self.base
+            guise = ascii+(guise*self.base)
         return guise
     def reveal(self,num):
         '''
