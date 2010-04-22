@@ -11,5 +11,8 @@ def main():
     one = DynamInt(2)
     two = DynamInt(2)
     rsa.createkeys(one, two)
+    crypted = rsa.encrypt("iamaboy")
+    crypted.printme()
+    print rsa.decrypt(crypted)
 if __name__ == '__main__':
     main()

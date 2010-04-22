@@ -34,6 +34,8 @@ class RSA(object):
         self.two.setData("2")
         self.three = DynamInt()
         self.three.setData("3")
+        self.base = DynamInt()
+        self.base.setData("10")
     '''
     Calculating RSA Parameters4
     '''    
@@ -94,18 +96,26 @@ class RSA(object):
     def getdecryptkey(self):
         self.d = self.extendedEuclid(self.phi, self.e)
         return False
-    def messagetonum(self,m):
+    def messageToNum(self,m):
         '''
         converts message to numbers
-        Accomplish this by looping through each element
-        in message var and converting it int. 
-        This int is added to a dynamint
+        
         @param param m: message
         @return: dynamic integer with numbers representing message
         '''
-        temp = DynamInt(len(m))
-        for char in m:
-            temp=temp+ord(char)
+        coded=self.disguise(m)
+        return coded
+    def numToMessage(self,m):
+        '''
+        converts numbers to message
+        
+        @param param m: message
+        @return: dynamic integer with numbers representing message
+        '''
+        
+        text=self.guise(m)
+        
+        return text
     def createphi(self):
         '''
         Create phi = (p-1)(q-1)
@@ -174,7 +184,7 @@ class RSA(object):
                 #generate random a where 2<=a<=n-2 here
                 #while >n-2 or <2 keep generating random numbers
                 a = self.zero;
-                while (a > (n-2) or a < 2):
+                while (a > (n-self.two) or a < self.two):
                     tt = DynamInt()
                     tt.random(n.size)
                     a = tt % n
@@ -207,16 +217,17 @@ class RSA(object):
         Calculates the modular exponentiation
         @param a,r,n
         '''
+        'self.one is a dynamic integer of one, 1'
         result = self.one;
 
         while (r > self.zero):
         
-            if (r & 1):
+            if not (r%self.two == self.zero):
             
                 result = (result * a) % n;
             
     
-            r = r >> self.one;
+            r = r/self.two;
             a = (a * a) % n;
         
         
@@ -246,11 +257,11 @@ class RSA(object):
         Encrypt the message using the keys created
         @param m: message
         '''
-        c = self.powmod(self.messagetonum(m),self.e,self.n)
-        return m
+        c = self.powmod(self.messageToNum(m),self.e,self.n)
+        return c
     def decrypt(self, m):
-        m_ret = self.powmod(self.messagetonum(m),self.d,self.n)
-        return m_ret
+        m_ret = self.powmod(m,self.d,self.n)
+        return self.reveal(m_ret)
     def disguise(self,text):
         '''
         converts message to numbers
@@ -261,16 +272,24 @@ class RSA(object):
         @return: dynamic integer with numbers representing message
         '''
         
-        guise =0 
+        guise =self.zero 
         for i in text:
             'convert to ascii base 10'
-            guise = ord(i)+guise*10
+            ascii = DynamInt()
+            ascii.setData(str(ord(i)))
+            guise = ascii+guise*self.base
         return guise
     def reveal(self,num):
+        '''
+        @summary: Converts from base 10 to readable string
+        @param num: number to reveal by converting from base 10 to string (8 bit data) 
+        '''
         g = []
-        while num >0:
-            r , num = num % 10, num / 10
+        
+        while num >self.zero:
+            r , num = num % self.base, num / self.base
             temp = r-self.one
             g.append(string.lowercase[int(temp.data)])
         g.reverse()
+        return g
     
